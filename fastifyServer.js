@@ -31,8 +31,9 @@ fastify.decorate('db', db)
 
 fastify.register(require('fastify-cors'), { origin: '*' })
 
-fastify.register(require('./fastifyPlugins/static.js'))
+fastify.register(require('./fastifyPlugins/deploy.js'))
 fastify.register(require('./fastifyPlugins/main.js'))
+fastify.register(require('./fastifyPlugins/static.js'))
 
 // Run the server!
 fastify.listen(process.env.PORT, '::', function (err, address) {
