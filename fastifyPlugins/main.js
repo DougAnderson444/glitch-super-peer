@@ -68,7 +68,7 @@ module.exports = function (fastify, options, done) {
     fi.register(require('fastify-bearer-auth'), { keys }) // only apply token requirement to this fastify instance (fi)
     fi.post('/pin/', opts, async (request, reply) => {
       const publicKey = request.body.rootKey
-      const latest = await fastify.setUp(publicKey)
+      const latest = await setUp(publicKey)
       reply.send({ latest }) // posted: request.body.query.rootKey
     })
 
