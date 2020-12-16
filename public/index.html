@@ -1,0 +1,43 @@
+<!-- This is a static file -->
+<!-- served from your routes in server.js -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Lowdb Example</title>
+  <meta name="description" content="Glitch SuperPeer">
+  <link id="favicon" rel="icon" href="favicon.ico" type="image/x-icon">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <header>
+    <h1>
+      A list of pinned Public Keys
+    </h1>
+  </header>
+
+  <main>
+    <p>Users:</p>
+    <section class="pins">
+      <ul id="pins">
+      </ul>
+    </section>
+    <p><a href="/reset">Reset</a> | <a href="/clear">Clear</a></p>
+  </main>
+
+  <script src="https://button.glitch.me/button.js" data-style="glitch"></script>
+  <div class="glitchButton" style="position:fixed;top:20px;right:20px;"></div>
+
+  <!-- Your web-app is https, so your scripts need to be too -->
+  <script src="https://code.jquery.com/jquery-2.2.1.min.js"
+    integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00=" crossorigin="anonymous"></script>
+  <script src="/client.js"></script>
+
+</body>
+
+</html>

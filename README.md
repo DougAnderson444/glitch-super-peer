@@ -1,4 +1,11 @@
-Git Glitched
+# HyPNS SuperPeer
+============
+
+A peer beyond the gate to keep your Hypns propagated and online.
+
+Should be good for a few hundred peers? Not stress tested yet.
+
+# Git Glitched
 ============
 
 Deploy to Glitch with a single `git push`.
