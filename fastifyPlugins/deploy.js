@@ -2,8 +2,16 @@ const { execSync } = require('child_process')
 
 module.exports = function (fastify, options, done) {
   // a hook to deploy new scripts to Glitch.com
-  fastify.post('/deploy', (request, reply) => {
-    if (request.querystring.secret !== process.env.SECRET) {
+  const opts = {
+    schema: {
+      query: {
+        secret: { type: 'string' }
+      }
+    }
+  }
+
+  fastify.post('/deploy', opts, (request, reply) => {
+    if (request.query.secret !== process.env.SECRET) {
       reply.code(401).send()
       return
     }
@@ -17,7 +25,7 @@ module.exports = function (fastify, options, done) {
 
     console.log('Fetching latest changes.')
     const output = execSync(
-            `git checkout -- ./ && git pull -X theirs ${repoUrl} glitch && refresh`
+      `git checkout -- ./ && git pull -X theirs ${repoUrl} glitch && refresh`
     ).toString()
     console.log(output)
     reply.send() // sends 200 by default
