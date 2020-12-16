@@ -1,4 +1,3 @@
-const port = 3001
 const fastify = require('fastify')({
   logger: { level: 'info', prettyPrint: true }
 })
@@ -36,7 +35,7 @@ fastify.register(require('./fastifyPlugins/static.js'))
 fastify.register(require('./fastifyPlugins/main.js'))
 
 // Run the server!
-fastify.listen(port, '::', function (err, address) {
+fastify.listen(process.env.PORT, '::', function (err, address) {
   if (err) {
     fastify.log.error(err)
     process.exit(1)
