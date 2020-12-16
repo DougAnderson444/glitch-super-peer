@@ -4,7 +4,7 @@
   "description": "Deploy to Glitch using git.",
   "main": "server.js",
   "scripts": {
-    "start:fastify": "node fastifyServer.js",
+    "start": "node fastifyServer.js",
     "lint": "standard --fix"
   },
   "dependencies": {
