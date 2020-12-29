@@ -1,7 +1,7 @@
 {
   "name": "glitch-superpeer",
   "version": "1.0.2",
-  "description": "Deploy to Glitch using git.",
+  "description": "Deploy HyPNS Super Peer to Glitch using git.",
   "main": "server.js",
   "scripts": {
     "start": "node fastifyServer.js",

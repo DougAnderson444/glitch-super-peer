@@ -5,15 +5,11 @@ const hypnsNode = new HyPNS({ persist: true, applicationName: '.data/hypnsapp' }
 
 module.exports = function (fastify, options, done) {
   const setUp = async (publicKey) => {
-    console.log('setting up ', publicKey)
-
     const instance = await hypnsNode.open({ keypair: { publicKey } })
     await instance.ready()
-    console.log(`1. Listener count ${instance.listenerCount('update')} on ${instance.key}`)
 
     // skip if the instance is already listening
     if (instance.listenerCount('update') < 1) {
-      console.log('Setup ', instance.publicKey, ` latest:${instance.listenerCount('update')}`)
       const d = Date.now()
       instance.on('update', (val) => {
         const lag = (new Date(Date.now())) - (new Date(instance.latest.timestamp))
@@ -22,10 +18,9 @@ module.exports = function (fastify, options, done) {
           .write()
       })
     }
-    console.log(`2. Listener count ${instance.listenerCount('update')} on ${instance.key}`)
 
     fastify.db.set(`pins.${publicKey}`, instance.latest).write()
-    console.log('** Setup COMPLETE ** \n', instance.publicKey, ` pins.size: [${fastify.db.get('pins').size().value()}]`)
+    console.log('** Setup COMPLETE ** ', instance.publicKey, ` pins.size: [${fastify.db.get('pins').size().value()}]`)
     return instance.latest
   }
 
@@ -86,8 +81,6 @@ module.exports = function (fastify, options, done) {
           out += `\n<br />${inst.publicKey}: ${inst.latest}`
         }
       }
-
-      console.log('** Pins/Out: ', out)
 
       reply
         .code(200)

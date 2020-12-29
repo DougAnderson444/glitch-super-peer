@@ -11,9 +11,7 @@ module.exports = function (fastify, options, done) {
   })
 
   fastify.get('/pins', function (request, reply) {
-    console.log('*** getting pins ***')
     const pins = fastify.db.get('pins').value() // Find all publicKeys pinned in the collection
-    console.log('*** pins ***', pins)
     reply.send(pins) // sends pins back to the page
   })
 
