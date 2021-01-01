@@ -1,6 +1,6 @@
 {
   "name": "glitch-superpeer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Deploy HyPNS Super Peer to Glitch using git.",
   "main": "server.js",
   "scripts": {
@@ -14,7 +14,8 @@
     "fastify-helmet": "^5.0.3",
     "fastify-plugin": "^3.0.0",
     "fastify-static": "^3.3.0",
-    "hypns": "^1.5.8",
+    "fs-extra": "^9.0.1",
+    "hypns": "^1.5.9",
     "lowdb": "1.x"
   },
   "engines": {
