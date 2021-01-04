@@ -19,7 +19,9 @@ if (db.get('pins').size().value() < 1) { db.defaults({ pins: {} }).write() }
 fastify.decorate('hypnsNode', new HyPNS({ persist: true, applicationName: '.data/hypnsapp' })) // , applicationName: '.data/hypnsapp'
 fastify.decorate('instances', new Map())
 
-fastify.register(require('fastify-helmet'))
+fastify.register(require('fastify-helmet'),
+  // Example disables the `contentSecurityPolicy` middleware but keeps the rest.
+  { contentSecurityPolicy: false })
 fastify.register(require('fastify-cors'), { origin: '*' })
 
 fastify.register(require('./fastifyPlugins/static.js'))
@@ -116,14 +118,14 @@ fastify.get('/pins/',
 )
 
 fastify.get('/pins', function (request, reply) {
-  const pins = this.db.get('pins').value() // Find all publicKeys pinned in the collection
+  const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
   reply.send(pins) // sends pins back to the page
 })
 
 // removes all entries from the collection
 fastify.get('/clear', function (request, reply) {
   // removes all entries from the collection
-  this.db.get('pins')
+  db.get('pins')
     .remove()
     .write()
   console.log('Database cleared')
