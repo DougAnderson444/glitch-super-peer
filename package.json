@@ -1,25 +1,42 @@
 {
-  "name": "git-glitched",
-  "version": "0.0.1",
-  "description": "Deploy to Glitch using git.",
+  "name": "glitch-superpeer",
+  "version": "1.0.4",
+  "description": "Deploy HyPNS Super Peer to Glitch using git.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node fastifyServer.js",
+    "lint": "standard --fix"
   },
   "dependencies": {
-    "express": "^4.16.3"
+    "fastify": "^3.9.1",
+    "fastify-bearer-auth": "^5.0.2",
+    "fastify-cors": "^5.1.0",
+    "fastify-helmet": "^5.0.3",
+    "fastify-plugin": "^3.0.0",
+    "fastify-static": "^3.3.0",
+    "fs-extra": "^9.0.1",
+    "hypns": "^1.6.1",
+    "lowdb": "1.x"
   },
   "engines": {
-    "node": "8.x"
+    "node": "12.x"
+  },
+  "author": {
+    "name": "Doug S Anderson",
+    "email": "douganderson444@gmail.com"
   },
   "repository": {
-    "url": "https://github.com/noise-machines/git-glitched"
+    "url": "https://github.com/DougAnderson444/glitch-superpeer"
   },
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "keywords": [
     "node",
     "glitch",
-    "express",
+    "fastify",
     "git"
-  ]
+  ],
+  "devDependencies": {
+    "pino-pretty": "^4.3.0",
+    "standard": "^16.0.3"
+  }
 }
