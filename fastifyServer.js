@@ -96,7 +96,6 @@ fastify.register((fi, options, done) => {
   done()
 })
 
-// curl -H "Authorization: Bearer thetokenhere" -X GET https://super.peerpiper.io/super/pins/
 fastify.get('/pins/',
   async (request, reply) => {
     let out = ''
