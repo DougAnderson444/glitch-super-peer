@@ -85,7 +85,7 @@ fastify.register((fi, options, done) => {
       }
     }
   }
-  const keys = new Set(['thetokenhere'])
+  const keys = new Set([process.env.TOKEN])
   fi.register(require('fastify-bearer-auth'), { keys }) // only apply token requirement to this fastify instance (fi)
   fi.post('/pin/', opts, async (request, reply) => {
     const publicKey = request.body.rootKey
