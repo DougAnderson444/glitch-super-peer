@@ -1,3 +1,8 @@
+# See the "Glitch" branch
+
+See the "Glitch" branch for changes that get sent to glitch.
+
+
 Git Glitched
 ============
 
