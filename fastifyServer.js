@@ -28,74 +28,93 @@ fastify.register(require('fastify-cors'), { origin: '*' })
 fastify.register(require('./fastifyPlugins/static.js'))
 fastify.register(require('./fastifyPlugins/deploy.js'))
 
-fastify.register((fi, options, done) => {
-  const setUp = async (publicKey) => {
-    // skip if it's already configured on this node
-    if (fastify.hypnsNode.instances.has(publicKey)) {
-      return fastify.hypnsNode.instances.get(publicKey).latest
+const schema = {
+  type: 'object',
+  required: ['PORT'],
+  properties: {
+    PORT: {
+      type: 'string',
+      default: 3001
     }
-    const instance = await fastify.hypnsNode.open({ keypair: { publicKey } })
-    await instance.ready()
-
-    // skip if the instance is already listening
-    if (instance.listenerCount('update') > 0) return
-
-    instance.on('update', (val) => {
-      console.log('Update ', instance.publicKey, ` latest:${instance.latest.timestamp} ${instance.latest.text}`)
-      db.set(`pins.${publicKey}`, instance.latest)
-        .write()
-    })
-
-    fastify.instances.set(instance.publicKey, instance)
-    db.set(`pins.${publicKey}`, instance.latest).write()
-    console.log('** Setup COMPLETE: ', instance.publicKey, ` pins.size: [${db.get('pins').size().value()}]`)
-    return instance.latest
   }
+}
+const options = {
+  confKey: 'config', // optional, default: 'config'
+  schema: schema,
+  dotenv: true // will read .env in root folder
+}
+// Run the server!
+fastify
+  .register(fastifyEnv, options)
+  .register((fi, options, done) => {
+    const setUp = async (publicKey) => {
+      // skip if it's already configured on this node
+      if (fastify.hypnsNode.instances.has(publicKey)) {
+        return fastify.hypnsNode.instances.get(publicKey).latest
+      }
+      const instance = await fastify.hypnsNode.open({ keypair: { publicKey } })
+      await instance.ready()
 
-  // load list from storage and initialize the node
-  const init = async () => {
-    const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
-    Object.keys(pins).forEach((key) => {
-      setUp(key)
-    })
-  }
+      // skip if the instance is already listening
+      if (instance.listenerCount('update') > 0) return
 
-  init()
+      instance.on('update', (val) => {
+        console.log('Update ', instance.publicKey, ` latest:${instance.latest.timestamp} ${instance.latest.text}`)
+        db.set(`pins.${publicKey}`, instance.latest)
+          .write()
+      })
 
-  // https://www.fastify.io/docs/latest/Validation-and-Serialization/
-  const opts = {
-    schema: {
-      body: {
-        type: 'object',
-        properties: {
-          rootKey: {
-            type: 'string',
-            minLength: 64, // https://json-schema.org/understanding-json-schema/reference/string.html#length
-            maxLength: 64
+      fastify.instances.set(instance.publicKey, instance)
+      db.set(`pins.${publicKey}`, instance.latest).write()
+      console.log('** Setup COMPLETE: ', instance.publicKey, ` pins.size: [${db.get('pins').size().value()}]`)
+      return instance.latest
+    }
+
+    // load list from storage and initialize the node
+    const init = async () => {
+      const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
+      Object.keys(pins).forEach((key) => {
+        setUp(key)
+      })
+    }
+
+    init()
+
+    // https://www.fastify.io/docs/latest/Validation-and-Serialization/
+    const opts = {
+      schema: {
+        body: {
+          type: 'object',
+          properties: {
+            rootKey: {
+              type: 'string',
+              minLength: 64, // https://json-schema.org/understanding-json-schema/reference/string.html#length
+              maxLength: 64
+            }
           }
-        }
-      },
-      querystring: {},
-      params: {},
-      headers: {
-        type: 'object',
-        properties: {
-          Authorization: { type: 'string' }
         },
-        required: ['Authorization']
+        querystring: {},
+        params: {},
+        headers: {
+          type: 'object',
+          properties: {
+            Authorization: { type: 'string' }
+          },
+          required: ['Authorization']
+        }
       }
     }
-  }
-  const keys = new Set([process.env.TOKEN]) // required to be sent from client if they want to pin here
-  fi.register(require('fastify-bearer-auth'), { keys }) // only apply token requirement to this fastify instance (fi)
-  fi.post('/pin/', opts, async (request, reply) => {
-    const publicKey = request.body.rootKey
-    const latest = await setUp(publicKey)
-    reply.send({ latest })
-  })
+    const keys = new Set([process.env.TOKEN]) // required to be sent from client if they want to pin here
+    console.log('keys are', keys)
+    fi.register(require('fastify-bearer-auth'), { keys }) // only apply token requirement to this fastify instance (fi)
+    fi.post('/pin/', opts, async (request, reply) => {
+      const publicKey = request.body.rootKey
+      const latest = await setUp(publicKey)
+      reply.send({ latest })
+    })
 
-  done()
-})
+    done()
+  })
 
 fastify.get('/pins/',
   async (request, reply) => {
@@ -132,20 +151,8 @@ fastify.get('/clear', function (request, reply) {
   reply.redirect('/')
 })
 
-const schema = {
-  type: 'object',
-  required: ['PORT'],
-  properties: {
-    PORT: {
-      type: 'string',
-      default: 3001
-    }
-  }
-}
-
 // Run the server!
 fastify
-  .register(fastifyEnv, { schema, dotenv: true })
   .listen(port, '::', function (err, address) {
     if (err) {
       fastify.log.error(err)
