@@ -1,6 +1,6 @@
-const HyPNS = require('hypns')
-const port = process.env.NODE_ENV !== 'production' ? 3001 : process.env.PORT
+const path = require('path')
 
+const HyPNS = require('hypns')
 const fastify = require('fastify')({
   // logger: { level: 'info', prettyPrint: true }
   // logger: { prettyPrint: true }
@@ -23,8 +23,6 @@ fastify.register(require('fastify-helmet'),
   // Example disables the `contentSecurityPolicy` middleware but keeps the rest.
   { contentSecurityPolicy: false })
 fastify.register(require('fastify-cors'), { origin: '*' })
-
-fastify.register(require('./fastifyPlugins/static.js'))
 fastify.register(require('./fastifyPlugins/deploy.js'))
 
 fastify.register((fi, options, done) => {
@@ -94,26 +92,6 @@ fastify.register((fi, options, done) => {
   done()
 })
 
-fastify.get('/pins/',
-  async (request, reply) => {
-    let out = ''
-    for (const inst of fastify.instances.values()) {
-      if (inst.latest) {
-        out += `\n<br />${inst.latest.timestamp} ${inst.publicKey}: ${inst.latest.text}`
-      } else {
-        out += `\n<br />${inst.publicKey}: ${inst.latest}`
-      }
-    }
-
-    console.log('** Pins/Out: ', out)
-
-    reply
-      .code(200)
-      .type('text/html')
-      .send(out)
-  }
-)
-
 fastify.get('/pins', function (request, reply) {
   const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
   reply.send(pins) // sends pins back to the page
@@ -129,8 +107,16 @@ fastify.get('/clear', function (request, reply) {
   reply.redirect('/')
 })
 
+fastify.register(require('fastify-static'), {
+  root: path.join(__dirname, '/public')
+})
+
+fastify.get('/', function (req, reply) {
+  reply.sendFile('index.html')
+})
+
 // Run the server!
-fastify.listen(port, '::', function (err, address) {
+fastify.listen(process.env.PORT, '::', function (err, address) {
   if (err) {
     fastify.log.error(err)
     process.exit(1)
