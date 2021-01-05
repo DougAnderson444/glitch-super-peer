@@ -20,9 +20,6 @@ if (db.get('pins').size().value() < 1) { db.defaults({ pins: {} }).write() }
 fastify.decorate('hypnsNode', new HyPNS({ persist: true, applicationName: '.data/hypnsapp' })) // , applicationName: '.data/hypnsapp'
 fastify.decorate('instances', new Map())
 
-fastify.register(fastifyEnv, {
-  dotenv: true // will read .env in root folder
-})
 fastify.register(require('fastify-helmet'),
   // Example disables the `contentSecurityPolicy` middleware but keeps the rest.
   { contentSecurityPolicy: false })
@@ -135,12 +132,25 @@ fastify.get('/clear', function (request, reply) {
   reply.redirect('/')
 })
 
-// Run the server!
-fastify.listen(port, '::', function (err, address) {
-  if (err) {
-    fastify.log.error(err)
-    process.exit(1)
+const schema = {
+  type: 'object',
+  required: ['PORT'],
+  properties: {
+    PORT: {
+      type: 'string',
+      default: 3001
+    }
   }
-  fastify.log.info(`server listening on ${address}`)
-  console.log(`server listening on ${address}`)
-})
+}
+
+// Run the server!
+fastify
+  .register(fastifyEnv, { schema, dotenv: true })
+  .listen(port, '::', function (err, address) {
+    if (err) {
+      fastify.log.error(err)
+      process.exit(1)
+    }
+    fastify.log.info(`server listening on ${address}`)
+    console.log(`server listening on ${address}`)
+  })
