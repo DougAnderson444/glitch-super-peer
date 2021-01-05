@@ -74,8 +74,6 @@ fastify.register((fi, options, done) => {
           }
         }
       },
-      querystring: {},
-      params: {},
       headers: {
         type: 'object',
         properties: {
