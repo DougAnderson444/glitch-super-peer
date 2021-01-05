@@ -85,11 +85,7 @@ fastify.register((fi, options, done) => {
       }
     }
   }
-<<<<<<< HEAD
   const keys = new Set([process.env.TOKEN]) // required to be sent from client if they want to pin here
-=======
-  const keys = new Set([process.env.TOKEN]) // required to be sent from client if they want to pin here
->>>>>>> glitch
   fi.register(require('fastify-bearer-auth'), { keys }) // only apply token requirement to this fastify instance (fi)
   fi.post('/pin/', opts, async (request, reply) => {
     const publicKey = request.body.rootKey
