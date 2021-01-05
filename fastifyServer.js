@@ -1,6 +1,7 @@
 const HyPNS = require('hypns')
 const port = process.env.NODE_ENV !== 'production' ? 3001 : process.env.PORT
 
+const fastifyEnv = require('fastify-env')
 const fastify = require('fastify')({
   // logger: { level: 'info', prettyPrint: true }
   // logger: { prettyPrint: true }
@@ -19,6 +20,9 @@ if (db.get('pins').size().value() < 1) { db.defaults({ pins: {} }).write() }
 fastify.decorate('hypnsNode', new HyPNS({ persist: true, applicationName: '.data/hypnsapp' })) // , applicationName: '.data/hypnsapp'
 fastify.decorate('instances', new Map())
 
+fastify.register(fastifyEnv, {
+  dotenv: true // will read .env in root folder
+})
 fastify.register(require('fastify-helmet'),
   // Example disables the `contentSecurityPolicy` middleware but keeps the rest.
   { contentSecurityPolicy: false })
