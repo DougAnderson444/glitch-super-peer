@@ -1,5 +1,6 @@
+const path = require('path')
+
 const HyPNS = require('hypns')
-const port = process.env.NODE_ENV !== 'production' ? 3001 : process.env.PORT
 
 const fastifyEnv = require('fastify-env')
 const fastify = require('fastify')({
@@ -24,8 +25,6 @@ fastify.register(require('fastify-helmet'),
   // Example disables the `contentSecurityPolicy` middleware but keeps the rest.
   { contentSecurityPolicy: false })
 fastify.register(require('fastify-cors'), { origin: '*' })
-
-fastify.register(require('./fastifyPlugins/static.js'))
 fastify.register(require('./fastifyPlugins/deploy.js'))
 
 const schema = {
@@ -93,8 +92,6 @@ fastify
             }
           }
         },
-        querystring: {},
-        params: {},
         headers: {
           type: 'object',
           properties: {
@@ -104,7 +101,7 @@ fastify
         }
       }
     }
-    const keys = new Set([process.env.TOKEN]) // required to be sent from client if they want to pin here
+    const keys = new Set([process.env.TOKEN])
     fi.register(require('fastify-bearer-auth'), { keys }) // only apply token requirement to this fastify instance (fi)
     fi.post('/pin/', opts, async (request, reply) => {
       const publicKey = request.body.rootKey
@@ -114,26 +111,6 @@ fastify
 
     done()
   })
-
-fastify.get('/pins/',
-  async (request, reply) => {
-    let out = ''
-    for (const inst of fastify.instances.values()) {
-      if (inst.latest) {
-        out += `\n<br />${inst.latest.timestamp} ${inst.publicKey}: ${inst.latest.text}`
-      } else {
-        out += `\n<br />${inst.publicKey}: ${inst.latest}`
-      }
-    }
-
-    console.log('** Pins/Out: ', out)
-
-    reply
-      .code(200)
-      .type('text/html')
-      .send(out)
-  }
-)
 
 fastify.get('/pins', function (request, reply) {
   const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
@@ -150,13 +127,20 @@ fastify.get('/clear', function (request, reply) {
   reply.redirect('/')
 })
 
+fastify.register(require('fastify-static'), {
+  root: path.join(__dirname, '/public')
+})
+
+fastify.get('/', function (req, reply) {
+  reply.sendFile('index.html')
+})
+
 // Run the server!
-fastify
-  .listen(port, '::', function (err, address) {
-    if (err) {
-      fastify.log.error(err)
-      process.exit(1)
-    }
-    fastify.log.info(`server listening on ${address}`)
-    console.log(`server listening on ${address}`)
-  })
+fastify.listen(process.env.PORT, '::', function (err, address) {
+  if (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+  fastify.log.info(`server listening on ${address}`)
+  console.log(`server listening on ${address}`)
+})
