@@ -2,15 +2,7 @@ const { execSync } = require('child_process')
 
 module.exports = function (fastify, options, done) {
   // a hook to deploy new scripts to Glitch.com
-  const opts = {
-    schema: {
-      query: {
-        secret: { type: 'string' }
-      }
-    }
-  }
-
-  fastify.post('/deploy', opts, (request, reply) => {
+  fastify.post('/deploy', { schema: { query: { secret: { type: 'string' } } } }, (request, reply) => {
     if (request.query.secret !== process.env.SECRET) {
       reply.code(401).send()
       return
