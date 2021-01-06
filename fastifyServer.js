@@ -58,10 +58,15 @@ fastify
       if (instance.listenerCount('update') > 0) return
 
       instance.on('update', (val) => {
-        console.log('Update ', instance.publicKey, ` latest:${instance.latest.timestamp} ${instance.latest.text}`)
+        console.log('Update ', instance.publicKey, ` latest:${instance.latest ? instance.latest.timestamp : null} ${instance.latest ? instance.latest.text : null}`)
         db.set(`pins.${publicKey}`, instance.latest)
           .write()
       })
+
+      // setInterval(function () {
+      //   console.log(`e ${new Date(Date.now()).toDateString()}`)
+      //   instance.emit('update')
+      // }, 10100)
 
       fastify.instances.set(instance.publicKey, instance)
       db.set(`pins.${publicKey}`, instance.latest).write()
